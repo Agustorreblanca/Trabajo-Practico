@@ -3,10 +3,10 @@
 Mi proyecto sobre el control de temperatura de una cámara frigorífica se manejará con las siguientes instrucciones: Habrá una temperatura configurada como Tconfig, un DeltaT y una temperatura TS que es la temperatura leída por un sensor. Esa temperatura podrá variar una cantidad DeltaT tal que Tconfig-DeltaT<TS<Tconfig+DeltaT. Cuando la temperatura TS<Tconfig-DeltaT, se habilitarán varias entradas de aire al exterior, considerando una temperatura ambiente en el aire. En caso de que la temperatura no se regule en un cierto tiempo programable, sonará una alarma para avisar por falta de calor. Si la temperatura TS retoma un valor mayor a Tconfig-DeltaT, entonces las entradas de aire se cierra.En caso de que la temperatura TS exceda a Tconfig+DeltaT, se habilitarán extractores de calor, un sistema de refrigeración aparte del que ya contiene la cámara frigorífica. Al igual que con las entradas de aire, si la temperatura no se regula en un cierto tiempo, se habilitará otra alarma
 
 ## Diagrama de Estados 
-[!text](image https://ibb.co/XZLyfjM)
+[!text](image https://ibb.co/VqKjkKc)
 
 
-### MAIN
+### MAIN.c
 ```c
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,9 +67,9 @@ datos_t f_inicio(void)
 
 #### LIB.H
 ``` c
- #include <stdio.h>
+  #include <stdio.h>
 #include <stdlib.h>
-#include "Untitled3.c"
+#include "DEF.H"
 estados_t f_espera(int *tconfig, int *to, int *deltat);
 estados_t f_enfriar(int *tconfig, int *to, int *deltat);
 estados_t f_calentar(int *tconfig, int *to, int *deltat);
@@ -160,7 +160,7 @@ estados_t f_enfriar (int *tconfig, int *to, int *deltat)
         printf("|Alarma encendida| \n");
         Ts=*to;
         est=espera;
-        return ;
+        return est;
 
     }
     datos_t f_inicio(void)
@@ -176,4 +176,21 @@ estados_t f_enfriar (int *tconfig, int *to, int *deltat)
     fclose(fp);
     return bf;
 }
+```
+##### DEF.H
+``` C
+typedef enum
+{
+    espera=0,
+    enfriar=1,
+    calentar=2,
+    alarma=3
+} estados_t;
+
+typedef struct
+{
+    int DeltaT;
+    int To;
+    int Tconfig;
+} datos_t;
 ```
