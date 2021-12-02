@@ -6,41 +6,21 @@ Mi proyecto sobre el control de temperatura de una cámara frigorífica se manej
 [!text](image https://ibb.co/VqKjkKc)
 
 
-### MAIN.c
+### main.c
 ```c
 #include <stdio.h>
 #include <stdlib.h>
 #include "lib.h"
-datos_t f_inicio(void);
-void crear(void);
 int main()
 {
-    int op,l=1;
-    int *deltat,*to,*tconfig;
+    int *deltat,*to,*tconfig,op;
     estados_t estado=espera;
     datos_t config;
-    printf("Desea configurar los datos? 1-si,0-no \n");
+    system("pause");
+    printf("Desea Ingresar los Datos De las variables? 1-si, 0-no");
     scanf("%d",&op);
     if(op)
-    {
-        FILE *fp;
-    datos_t bf;
-    if((fp=fopen("config.txt","at+"))==NULL)
-        {printf("error \n");
-    return;
-}
-printf("Ingrese los datos configurables \n");
-system("pause");
-printf("Ingrese DeltaT:");
-scanf("%d",&bf.DeltaT);
-printf("\nIngrese To:");
-scanf("%d",&bf.To);
-printf("\n Ingrese Tconfig:");
-scanf("%d",&bf.Tconfig);
-fwrite(&bf,sizeof(datos_t),1,fp);
-fclose(fp);
-    }
-    system("pause");
+    crear();
     config=f_inicio();
     deltat=&config.DeltaT;
     to=&config.To;
@@ -50,30 +30,12 @@ fclose(fp);
             estado=(*fsm[estado])(deltat ,to,tconfig);
         return 0;
 }
-datos_t f_inicio(void)
-{
-    FILE *fp;
-    datos_t bf;
-    if((fp=fopen("config.txt","rt"))==NULL)
-    {
-        printf("Error al abrir el archivo \n");
-        return;
-    }
-    fread(&bf,sizeof(datos_t),1,fp);
-    fclose(fp);
-    return bf;
-}
 ```
-
-#### LIB.H
+#### funciones.c
 ``` c
-  #include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include "DEF.H"
-estados_t f_espera(int *tconfig, int *to, int *deltat);
-estados_t f_enfriar(int *tconfig, int *to, int *deltat);
-estados_t f_calentar(int *tconfig, int *to, int *deltat);
-estados_t f_alarma (int *tconfig, int *to, int *deltat);
+#include "lib.h"
 int Ts;
 estados_t f_espera(int *tconfig, int *to, int *deltat)
 {
@@ -176,9 +138,31 @@ estados_t f_enfriar (int *tconfig, int *to, int *deltat)
     fclose(fp);
     return bf;
 }
+
+crear(void)
+{
+ FILE *fp;
+ datos_t bf;
+ if((fp=fopen("config.txt","at"))==NULL)
+ {
+     printf("Error al crear el archivo \n");
+     return;
+ }
+ printf("Ingrese el Valor De las Variables \n");
+ printf("DeltaT:");
+ scanf("%d", &bf.DeltaT);
+ printf("\n Tconfig :");
+ scanf("%d", &bf.Tconfig);
+ printf("\n To:");
+ scanf("%d",&bf.To);
+ fwrite(&bf,sizeof(datos_t),1,fp);
+ fclose(fp);
+ }
 ```
-##### DEF.H
-``` C
+###### lib.h
+``` c
+ #include <stdio.h>
+#include <stdlib.h>
 typedef enum
 {
     espera=0,
@@ -193,4 +177,10 @@ typedef struct
     int To;
     int Tconfig;
 } datos_t;
+datos_t f_inicio(void);
+void crear(void);
+estados_t f_espera(int *tconfig, int *to, int *deltat);
+estados_t f_enfriar(int *tconfig, int *to, int *deltat);
+estados_t f_calentar(int *tconfig, int *to, int *deltat);
+estados_t f_alarma (int *tconfig, int *to, int *deltat);
 ```
